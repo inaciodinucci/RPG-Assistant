@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "RPG Assistant",
+    "version": "1.0",
+    "description": "Assistente de RPG para o Habblet Hotel",
+    "permissions": ["storage", "scripting"],
+    "content_scripts": [
+      {
+        "matches": ["https://www.habblet.city/hotel*"],
+        "js": ["content.js"],
+        "run_at": "document_idle"
+      }
+    ]
+  }

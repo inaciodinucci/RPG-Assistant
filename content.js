@@ -173,333 +173,456 @@ const Storage = {
 async function initRPGAssistant() {
     const styleElement = document.createElement("style");
     styleElement.innerHTML = `
-    /* RPG Assistant Styles */
-    .rpg-assistant-button {
-        position: fixed;
-        left: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        cursor: pointer;
-    }
-    
-    .rpg-assistant-icon {
-        width: 36px;
-        height: 36px;
-        background-color: #444;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 22px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        transition: transform 0.3s ease;
-    }
-    
-    .rpg-assistant-icon:hover {
-        transform: scale(1.1);
-        background-color: #555;
-    }
-    
-    .rpg-assistant-text {
-        margin-top: 5px;
-        font-size: 11px;
-        font-weight: bold;
-        font-family: 'Arial', 'Helvetica', sans-serif;
-        color: white;
-        text-shadow: 0px 1px 2px rgba(0,0,0,0.8);
-        letter-spacing: 0.5px;
-        white-space: nowrap;
-    }
-    
-    /* RPG Assistant Panel */
-    .rpg-assistant-panel {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: rgba(60, 60, 60, 0.9);
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        width: 600px;
-        color: #fff;
-        font-family: 'Arial', sans-serif;
-        display: none;
-    }
-    
-    .rpg-assistant-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px;
-        border-bottom: 1px solid #555;
-        cursor: move;
-        background-color: rgba(50, 50, 50, 0.7);
-        border-radius: 8px 8px 0 0;
-    }
-    
-    .rpg-assistant-header h2 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: bold;
-    }
-    
-    .rpg-assistant-close {
-        cursor: pointer;
-        font-size: 20px;
-        color: #ccc;
-    }
-    
-    .rpg-assistant-close:hover {
-        color: #fff;
-    }
-    
-    .rpg-assistant-menu {
-        display: flex;
-        border-bottom: 1px solid #555;
-        padding: 0 5px;
-        background-color: rgba(55, 55, 55, 0.7);
-    }
-    
-    .rpg-assistant-menu-item {
-        padding: 10px 15px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        border-bottom: 2px solid transparent;
-    }
-    
-    .rpg-assistant-menu-item:hover,
-    .rpg-assistant-menu-item.active {
-        background-color: rgba(80, 80, 80, 0.5);
-        border-bottom: 2px solid #4a90e2;
-    }
-    
-    .rpg-assistant-content {
-        padding: 15px;
-        max-height: 400px;
-        overflow-y: auto;
-    }
-    
-    /* Character Module Styles */
-    .rpg-assistant-characters-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 15px;
-        padding: 10px 0;
-    }
-    
-    .rpg-assistant-character {
-        background-color: rgba(70, 70, 70, 0.5);
-        border-radius: 6px;
-        overflow: hidden;
-        transition: all 0.2s ease;
-    }
-    
-    .rpg-assistant-character:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        background-color: rgba(80, 80, 80, 0.6);
-    }
-    
-    .rpg-assistant-character-figure {
-        height: 110px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: rgba(40, 40, 40, 0.6);
-    }
-    
-    .rpg-assistant-character-info {
-        padding: 8px;
-    }
-    
-    .rpg-assistant-character-name {
-        font-size: 12px;
-        font-weight: bold;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        text-align: center;
-        margin-bottom: 8px;
-    }
-    
-    .rpg-assistant-character-buttons {
-        display: flex;
-        gap: 5px;
-    }
-    
-    .rpg-assistant-button-use {
-        flex-grow: 1;
-        background-color: #4a90e2;
-        color: white;
-        border: none;
-        border-radius: 3px;
-        padding: 4px;
-        cursor: pointer;
-        font-size: 11px;
-    }
-    
-    .rpg-assistant-button-use:hover {
-        background-color: #3a80d2;
-    }
-    
-    .rpg-assistant-button-edit,
-    .rpg-assistant-button-delete {
-        background-color: #555;
-        color: white;
-        border: none;
-        border-radius: 3px;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
-    
-    .rpg-assistant-button-edit:hover {
-        background-color: #666;
-    }
-    
-    .rpg-assistant-button-delete:hover {
-        background-color: #e74c3c;
-    }
-    
-    .rpg-assistant-add-character {
-        height: 100%;
-        min-height: 160px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: rgba(70, 70, 70, 0.4);
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    
-    .rpg-assistant-add-character:hover {
-        background-color: rgba(80, 80, 80, 0.5);
-    }
-    
-    .rpg-assistant-add-icon {
-        font-size: 36px;
-        margin-bottom: 10px;
-    }
-    
-    /* Character Editor */
-    .rpg-assistant-character-editor {
-        background-color: rgba(65, 65, 65, 0.95);
-        padding: 15px;
-        border-radius: 6px;
-        margin-top: 15px;
-        border: 1px solid #555;
-    }
-    
-    .rpg-assistant-editor-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-    
-    .rpg-assistant-editor-title {
-        font-size: 16px;
-        font-weight: bold;
-    }
-    
-    .rpg-assistant-editor-close {
-        cursor: pointer;
-        font-size: 18px;
-        color: #ccc;
-    }
-    
-    .rpg-assistant-editor-content {
-        display: flex;
-        gap: 15px;
-    }
-    
-    .rpg-assistant-editor-figure {
-        width: 120px;
-        height: 130px;
-        background-color: rgba(50, 50, 50, 0.6);
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .rpg-assistant-editor-form {
-        flex-grow: 1;
-    }
-    
-    .rpg-assistant-editor-field {
-        margin-bottom: 10px;
-    }
-    
-    .rpg-assistant-editor-label {
-        display: block;
-        margin-bottom: 5px;
-        font-size: 12px;
-        color: #ccc;
-    }
-    
-    .rpg-assistant-editor-input {
-        width: 100%;
-        padding: 8px;
-        background-color: rgba(80, 80, 80, 0.5);
-        border: 1px solid #666;
-        border-radius: 4px;
-        color: white;
-    }
-    
-    .rpg-assistant-editor-buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-    }
-    
-    .rpg-assistant-editor-button {
-        padding: 8px 12px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-    
-    .rpg-assistant-editor-button-copy {
-        background-color: #2ecc71;
-        color: white;
-    }
-    
-    .rpg-assistant-editor-button-copy:hover {
-        background-color: #27ae60;
-    }
-    
-    .rpg-assistant-editor-button-save {
-        background-color: #4a90e2;
-        color: white;
-    }
-    
-    .rpg-assistant-editor-button-save:hover {
-        background-color: #3a80d2;
-    }
-    
-    .rpg-assistant-editor-button-cancel {
-        background-color: #555;
-        color: #eee;
-    }
-    
-    .rpg-assistant-editor-button-cancel:hover {
-        background-color: #666;
-    }
+.rpg-assistant-button {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.rpg-assistant-icon {
+    width: 36px;
+    height: 36px;
+
+    background-color: #6c757d; 
+    border-radius: 6px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease;
+}
+
+.rpg-assistant-icon:hover {
+    background-color: #5a6268; 
+}
+
+.rpg-assistant-text {
+    margin-top: 4px;
+    font-size: 10px; 
+    font-weight: bold;
+    font-family: 'Ubuntu', 'Verdana', 'Arial', 'Helvetica', sans-serif; 
+    color: #333; 
+    text-shadow: none; 
+    white-space: nowrap;
+}
+
+.rpg-assistant-panel {
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000; 
+    width: 550px; 
+    color: #000; 
+    font-family: 'Ubuntu', 'Verdana', 'Arial', 'Helvetica', sans-serif; 
+
+    background-color: #fff; 
+    border: 1px solid #ccc;
+    border-radius: 6px; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: none; 
+    overflow: hidden; 
+    flex-direction: column; 
+}
+
+.rpg-assistant-header {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 15px; 
+    border-bottom: 1px solid #dee2e6; 
+    cursor: move;
+    background-color: #f8f9fa; 
+    border-radius: 6px 6px 0 0; 
+    color: #333; 
+}
+
+.rpg-assistant-header h2 {
+    margin: 0;
+    font-size: 16px; 
+    font-weight: bold;
+}
+
+.rpg-assistant-close {
+    cursor: pointer;
+    font-size: 24px; 
+    font-weight: bold;
+    color: #6c757d; 
+    line-height: 1;
+    padding: 0 5px; 
+}
+
+.rpg-assistant-close:hover {
+    color: #dc3545; 
+}
+
+.rpg-assistant-menu {
+
+    display: flex;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0 10px; 
+    background-color: #f8f9fa; 
+}
+
+.rpg-assistant-menu-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px; 
+    font-size: 14px; 
+    color: #333;
+    border-bottom: 3px solid transparent; 
+    margin-bottom: -1px; 
+}
+
+.rpg-assistant-menu-item:hover {
+    background-color: #e9ecef; 
+    color: #000;
+}
+
+.rpg-assistant-menu-item.active {
+    border-bottom: 3px solid #0d6efd; 
+    font-weight: bold;
+    color: #000;
+}
+
+.rpg-assistant-content {
+
+    padding: 15px;
+    max-height: 450px; 
+    overflow-y: auto;
+    background-color: #fff; 
+    color: #000; 
+}
+
+.rpg-assistant-content::-webkit-scrollbar {
+    width: 8px;
+}
+.rpg-assistant-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+.rpg-assistant-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+.rpg-assistant-content::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+.rpg-assistant-characters-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+    gap: 10px; 
+    padding: 10px 0;
+}
+
+.rpg-assistant-character {
+    background-color: #f8f9fa; 
+    border-radius: 6px;
+    border: 1px solid #dee2e6; 
+    overflow: hidden;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column; 
+}
+
+.rpg-assistant-character:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    border-color: #adb5bd; 
+}
+
+.rpg-assistant-character-figure {
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e9ecef; 
+    border-bottom: 1px solid #dee2e6; 
+}
+.rpg-assistant-character-figure img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.rpg-assistant-character-info {
+    padding: 10px; 
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+}
+
+.rpg-assistant-character-name {
+    font-size: 13px; 
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    color: #000; 
+}
+
+.rpg-assistant-character-buttons {
+    display: flex;
+    gap: 5px; 
+}
+
+.rpg-assistant-button-use,
+.rpg-assistant-button-edit,
+.rpg-assistant-button-delete {
+
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff; 
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: 0.25rem 0.5rem; 
+    font-size: 0.875rem; 
+    border-radius: 0.2rem; 
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.rpg-assistant-button-use {
+    flex-grow: 1; 
+    background-color: #0d6efd; 
+    border-color: #0d6efd;
+}
+.rpg-assistant-button-use:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.rpg-assistant-button-edit {
+    width: auto; 
+    height: auto; 
+    background-color: #6c757d; 
+    border-color: #6c757d;
+    padding: 0.25rem 0.6rem; 
+}
+.rpg-assistant-button-edit:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+}
+
+.rpg-assistant-button-delete {
+    width: auto; 
+    height: auto; 
+    background-color: #dc3545; 
+    border-color: #dc3545;
+    padding: 0.25rem 0.6rem; 
+}
+.rpg-assistant-button-delete:hover {
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+}
+
+.rpg-assistant-add-character {
+    min-height: 160px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border: 2px dashed #ced4da; 
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #6c757d; 
+    font-size: 13px;
+    text-align: center;
+}
+
+.rpg-assistant-add-character:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+    color: #333;
+}
+
+.rpg-assistant-add-icon {
+    font-size: 30px; 
+    margin-bottom: 8px;
+}
+
+.rpg-assistant-character-editor {
+    background-color: #f8f9fa; 
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px; 
+    border: 1px solid #dee2e6; 
+    color: #000; 
+}
+
+.rpg-assistant-editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px; 
+    border-bottom: 1px solid #dee2e6; 
+}
+
+.rpg-assistant-editor-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.rpg-assistant-editor-close {
+    cursor: pointer;
+    font-size: 22px; 
+    font-weight: bold;
+    color: #6c757d;
+    line-height: 1;
+}
+.rpg-assistant-editor-close:hover {
+    color: #dc3545;
+}
+
+.rpg-assistant-editor-content {
+    display: flex;
+    gap: 20px; 
+}
+
+.rpg-assistant-editor-figure {
+    width: 120px;
+    height: 130px; 
+    background-color: #e9ecef; 
+    border-radius: 4px;
+    border: 1px solid #dee2e6; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d; 
+    flex-shrink: 0; 
+}
+.rpg-assistant-editor-figure img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.rpg-assistant-editor-form {
+    flex-grow: 1;
+}
+
+.rpg-assistant-editor-field {
+    margin-bottom: 15px; 
+}
+
+.rpg-assistant-editor-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 13px; 
+    font-weight: bold; 
+    color: #333; 
+}
+
+.rpg-assistant-editor-input {
+
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    appearance: none;
+    border-radius: 0.25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+.rpg-assistant-editor-input:focus {
+    color: #212529;
+    background-color: #fff;
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.rpg-assistant-editor-buttons {
+    display: flex;
+    gap: 10px; 
+    margin-top: 20px; 
+    justify-content: flex-end; 
+}
+
+.rpg-assistant-editor-button {
+
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem; 
+    font-size: 1rem; 
+    border-radius: 0.25rem; 
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.rpg-assistant-editor-button-copy {
+    background-color: #198754; 
+    border-color: #198754;
+}
+.rpg-assistant-editor-button-copy:hover {
+    background-color: #157347;
+    border-color: #146c43;
+}
+
+.rpg-assistant-editor-button-save {
+    background-color: #0d6efd; 
+    border-color: #0d6efd;
+}
+.rpg-assistant-editor-button-save:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.rpg-assistant-editor-button-cancel {
+    background-color: #6c757d; 
+    border-color: #6c757d;
+    color: #fff;
+}
+.rpg-assistant-editor-button-cancel:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+}
+
+.fw-bold { font-weight: bold; }
+.text-black { color: #000 !important; }
+.d-flex { display: flex !important; }
+.gap-1 { gap: 0.25rem !important; }
+.gap-2 { gap: 0.5rem !important; }
+.gap-3 { gap: 1rem !important; }
+.align-items-center { align-items: center !important; }
+.justify-content-between { justify-content: space-between !important; }
+.justify-content-center { justify-content: center !important; }
+.flex-column { flex-direction: column !important; }
+
+
     `;
     document.head.appendChild(styleElement);
     
